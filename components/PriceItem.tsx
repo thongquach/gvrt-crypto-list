@@ -2,8 +2,8 @@ import { Coin } from '@/hooks/queryHooks';
 
 import { StyleSheet } from 'react-native';
 import { formatCurrency, formatNumber } from '@/utils/format';
-import { ThemedView } from '../ThemedView';
-import { ThemedText } from '../ThemedText';
+import { ThemedView } from './ThemedView';
+import { ThemedText } from './ThemedText';
 
 export function PriceItem({ coin }: { coin: Coin }) {
   const {
