@@ -1,12 +1,21 @@
 import api from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
 
+type TradingInfo = {
+  price: number;
+  percent_change_1h: number;
+  percent_change_24h: number;
+};
+
+export type Coin = {
+  id: number;
+  name: string;
+  symbol: string;
+  quote: { USD: TradingInfo; BTC: TradingInfo };
+};
+
 type LatestListResponse = {
-  data: {
-    id: number;
-    name: string;
-    symbol: string;
-  }[];
+  data: Coin[];
 };
 
 const fetchLatestList = async () => {

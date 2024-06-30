@@ -1,23 +1,19 @@
-import { StyleSheet, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { useLatestList } from '@/hooks/queryHooks';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import React from 'react';
+import PriceList from '../../components/PriceList';
 
-export default function HomeScreen() {
+export default function Dashboard() {
   const { data, isLoading, error } = useLatestList();
 
   return (
     <ThemedSafeAreaView>
       {isLoading && <ActivityIndicator />}
       {error && <ThemedText>Error: {error.message}</ThemedText>}
-      {!isLoading && data ? (
-        data.map((item) => <ThemedText key={item.id}>{item.name}</ThemedText>)
-      ) : (
-        <ThemedText>No data available</ThemedText>
-      )}
+      {!isLoading && data && <PriceList coins={data} />}
     </ThemedSafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({});
