@@ -9,12 +9,14 @@ import { FlashList } from '@shopify/flash-list';
 import { PriceItem } from '@/components/PriceItem';
 
 export default function Dashboard() {
-  const { data, isLoading, error, refetch, isFetching } = useLatestList();
+  const { data, error, fetchNextPage, isFetching, isLoading, refetch } =
+    useLatestList();
   console.log({ isLoading, isFetching });
 
   // search
   const [search, setSearch] = React.useState('');
-  const filteredData = data?.filter(
+  const coins = data?.pages.flat();
+  const filteredCoins = coins?.filter(
     (coin) =>
       coin.name.toLowerCase().includes(search.toLowerCase()) ||
       coin.symbol.toLowerCase().includes(search.toLowerCase()),
@@ -27,14 +29,18 @@ export default function Dashboard() {
       {!isLoading && data && (
         <>
           <SearchInput value={search} onChangeText={setSearch} />
+          <ThemedText>{coins?.length}</ThemedText>
           <FlashList
-            data={filteredData}
+            data={filteredCoins}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <PriceItem coin={item} />}
-            estimatedItemSize={100} // TODO: update this
+            estimatedItemSize={100}
             refreshControl={
               <RefreshControl refreshing={isFetching} onRefresh={refetch} />
             }
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={isFetching ? <ActivityIndicator /> : null}
           />
         </>
       )}

@@ -1,5 +1,5 @@
 import api from '@/utils/api';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 type TradingInfo = {
   price: number;
@@ -18,17 +18,22 @@ type LatestListResponse = {
   data: Coin[];
 };
 
-const fetchLatestList = async () => {
+const LIMIT = 20;
+
+const fetchLatestList = async (page = 0) => {
+  console.log({ page });
   const { data } = await api.get<LatestListResponse>(
-    'v1/cryptocurrency/listings/latest',
+    `v1/cryptocurrency/listings/latest?start=${page * LIMIT + 1}&limit=${LIMIT}`,
   );
-  return data;
+  return data.data;
 };
 
 export const useLatestList = () => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['latestList'],
-    queryFn: fetchLatestList,
-    select: (response) => response.data,
+    queryFn: ({ pageParam }) => fetchLatestList(pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (_firstPage, _allPages, lastPageParam) =>
+      lastPageParam + 1,
   });
 };
