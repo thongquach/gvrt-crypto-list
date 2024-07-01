@@ -3,7 +3,7 @@ import { ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Coin, useLatestList, useUpdates } from '@/hooks/queryHooks';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
-import React from 'react';
+import React, { useEffect } from 'react';
 import SearchInput from '@/components/SeachInput';
 import { FlashList } from '@shopify/flash-list';
 import { PriceItem } from '@/components/PriceItem';
@@ -12,6 +12,7 @@ import IntervalCountdown from '@/components/IntervalCountdown';
 import { useDashboard } from '@/utils/dashboardStore';
 import queryClient from '@/utils/queryClient';
 import { InfiniteData } from '@tanstack/react-query';
+import CurrentTime from '@/components/CurrentTime';
 
 export default function Dashboard() {
   const { data, error, fetchNextPage, isFetching, isLoading, refetch } =
@@ -39,6 +40,11 @@ export default function Dashboard() {
       coin.symbol.toLowerCase().includes(search.toLowerCase()),
   );
 
+  useEffect(() => {
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ThemedSafeAreaView>
       {isLoading && <ActivityIndicator />}
@@ -52,6 +58,10 @@ export default function Dashboard() {
               text="Updates in "
               onIntervalFinish={refetchUpdates}
             />
+          </ThemedView>
+          <ThemedView style={styles.info}>
+            <ThemedText type="secondary">{`Last updated: ${lastFetchTime.toLocaleTimeString()}`}</ThemedText>
+            <CurrentTime />
           </ThemedView>
           <FlashList
             data={filteredCoins}
@@ -75,7 +85,11 @@ export default function Dashboard() {
                 }}
               />
             }
-            onEndReached={fetchNextPage}
+            onEndReached={() => {
+              if (filteredCoins?.length === updatedCoins?.length) {
+                fetchNextPage();
+              }
+            }}
             onEndReachedThreshold={0.1}
             ListFooterComponent={isFetching ? <ActivityIndicator /> : null}
           />
