@@ -1,7 +1,7 @@
 import { ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import { useLatestList, useUpdates } from '@/hooks/queryHooks';
+import { Coin, useLatestList, useUpdates } from '@/hooks/queryHooks';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
 import React from 'react';
 import SearchInput from '@/components/SeachInput';
@@ -10,6 +10,8 @@ import { PriceItem } from '@/components/PriceItem';
 import { ThemedView } from '@/components/ThemedView';
 import IntervalCountdown from '@/components/IntervalCountdown';
 import { useDashboard } from '@/utils/dashboardStore';
+import queryClient from '@/utils/queryClient';
+import { InfiniteData } from '@tanstack/react-query';
 
 export default function Dashboard() {
   const { data, error, fetchNextPage, isFetching, isLoading, refetch } =
@@ -60,6 +62,13 @@ export default function Dashboard() {
               <RefreshControl
                 refreshing={isFetching}
                 onRefresh={() => {
+                  queryClient.setQueryData(
+                    ['latestList'],
+                    (data: InfiniteData<Coin>) => ({
+                      pages: data.pages.slice(0, 1),
+                      pageParams: data.pageParams.slice(0, 1),
+                    }),
+                  );
                   if (Date.now() - lastFetchTime.getTime() > 20000) {
                     refetch();
                   }
