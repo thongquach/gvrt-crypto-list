@@ -58,6 +58,6 @@ export const useUpdates = (ids: number[]) => {
     queryKey: ['updates', ids],
     queryFn: () => fetchUpdates(ids),
     staleTime: 0,
-    enabled: ids.length > 0,
+    enabled: false,
   });
 };

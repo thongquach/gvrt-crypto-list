@@ -69,7 +69,7 @@ export default function Dashboard() {
                       pageParams: data.pageParams.slice(0, 1),
                     }),
                   );
-                  if (Date.now() - lastFetchTime.getTime() > 20000) {
+                  if (Date.now() - lastFetchTime.getTime() > 60000) {
                     refetch();
                   }
                 }}
