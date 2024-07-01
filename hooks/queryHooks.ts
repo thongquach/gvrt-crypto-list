@@ -24,6 +24,7 @@ type LatestListResponse = {
 
 const LIMIT = 50;
 const fetchLatestList = async (page = 0) => {
+  console.log('fetchLatestList: page', page);
   DashboardStoreRegistry.actions.updateLastFetchTime();
   const { data } = await api.get<LatestListResponse>(
     `v1/cryptocurrency/listings/latest?start=${page * LIMIT + 1}&limit=${LIMIT}`,
@@ -47,6 +48,7 @@ type UpdatesResponse = {
 };
 
 const fetchUpdates = async (ids: number[]) => {
+  console.log('fetchUpdates: ids', ids);
   const { data } = await api.get<UpdatesResponse>(
     `/v2/cryptocurrency/quotes/latest?id=${ids.join(',')}`,
   );
