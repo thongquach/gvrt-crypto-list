@@ -1,22 +1,33 @@
-import { ActivityIndicator, RefreshControl } from 'react-native';
+import { ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import { useLatestList } from '@/hooks/queryHooks';
+import { useLatestList, useUpdates } from '@/hooks/queryHooks';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
 import React from 'react';
 import SearchInput from '@/components/SeachInput';
 import { FlashList } from '@shopify/flash-list';
 import { PriceItem } from '@/components/PriceItem';
+import { ThemedView } from '@/components/ThemedView';
+import IntervalCountdown from '@/components/IntervalCountdown';
 
 export default function Dashboard() {
   const { data, error, fetchNextPage, isFetching, isLoading, refetch } =
     useLatestList();
+  const coins = data?.pages.flat();
   console.log({ isLoading, isFetching });
+
+  // live updates
+  const { data: updates, refetch: refetchUpdates } = useUpdates(
+    coins?.map((coin) => coin.id) || [], // TODO: do not call API when no coins
+  );
+  const mergedCoins = coins?.map((coin) => {
+    const update = updates?.find((u) => u.id === coin.id);
+    return update ? { ...coin, ...update } : coin;
+  });
 
   // search
   const [search, setSearch] = React.useState('');
-  const coins = data?.pages.flat();
-  const filteredCoins = coins?.filter(
+  const filteredCoins = mergedCoins?.filter(
     (coin) =>
       coin.name.toLowerCase().includes(search.toLowerCase()) ||
       coin.symbol.toLowerCase().includes(search.toLowerCase()),
@@ -29,9 +40,15 @@ export default function Dashboard() {
       {!isLoading && data && (
         <>
           <SearchInput value={search} onChangeText={setSearch} />
-          <ThemedText>{coins?.length}</ThemedText>
+          <ThemedView style={styles.info}>
+            <ThemedText type="secondary">{`Showing ${filteredCoins?.length} of ${coins?.length} results`}</ThemedText>
+            <IntervalCountdown
+              text="Updates in "
+              onIntervalFinish={refetchUpdates}
+            />
+          </ThemedView>
           <FlashList
-            data={filteredCoins}
+            data={mergedCoins}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <PriceItem coin={item} />}
             estimatedItemSize={100}
@@ -47,3 +64,11 @@ export default function Dashboard() {
     </ThemedSafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  info: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
+});

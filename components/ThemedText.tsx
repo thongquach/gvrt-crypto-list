@@ -38,6 +38,7 @@ const typeStyles = StyleSheet.create({
   },
   secondary: {
     fontSize: 13,
+    lineHeight: 20,
   },
 });
 

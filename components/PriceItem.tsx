@@ -41,8 +41,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 4,
-    paddingVertical: 10,
+    padding: 10,
   },
   price: {
     textAlign: 'right',

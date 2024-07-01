@@ -1,10 +1,12 @@
 import axios from 'axios';
 
+const TIMEOUT = 10000;
+
 const api = axios.create({
   baseURL: 'https://pro-api.coinmarketcap.com',
-  timeout: 10000,
+  timeout: TIMEOUT,
   headers: {
-    'X-CMC_PRO_API_KEY': '5f84ab80-23ff-41dc-9744-d587a26ab4e2',
+    'X-CMC_PRO_API_KEY': process.env.EXPO_PUBLIC_COIN_MARKET_CAP_API_KEY,
   },
 });
 

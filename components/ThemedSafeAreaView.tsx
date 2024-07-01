@@ -30,7 +30,6 @@ export function ThemedSafeAreaView({
         {
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
-          paddingHorizontal: 10,
           backgroundColor,
         },
       ]}
