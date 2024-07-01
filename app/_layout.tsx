@@ -9,10 +9,10 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { QueryClientProvider } from '@tanstack/react-query';
-import queryClient from '@/utils/queryClient';
+import queryClient, { asyncStoragePersister } from '@/utils/queryClient';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Dashboard from './dashboard';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -36,9 +36,12 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister: asyncStoragePersister }}
+        >
           <Dashboard />
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

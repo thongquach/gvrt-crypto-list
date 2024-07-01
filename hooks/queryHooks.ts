@@ -1,16 +1,20 @@
 import api from '@/utils/api';
+import { DashboardStoreRegistry } from '@/utils/dashboardStore';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
+// TODO: conver to camelCase
 type Quote = {
   price: number;
   percent_change_1h: number;
   percent_change_24h: number;
+  last_updated: string;
 };
 
 export type Coin = {
   id: number;
   name: string;
   symbol: string;
+  last_updated: string;
   quote: { USD: Quote; BTC: Quote };
 };
 
@@ -20,6 +24,8 @@ type LatestListResponse = {
 
 const LIMIT = 50;
 const fetchLatestList = async (page = 0) => {
+  console.log('fetchLatestList: page', page);
+  DashboardStoreRegistry.actions.updateLastFetchTime();
   const { data } = await api.get<LatestListResponse>(
     `v1/cryptocurrency/listings/latest?start=${page * LIMIT + 1}&limit=${LIMIT}`,
   );

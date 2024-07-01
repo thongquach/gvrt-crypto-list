@@ -9,20 +9,24 @@ import { FlashList } from '@shopify/flash-list';
 import { PriceItem } from '@/components/PriceItem';
 import { ThemedView } from '@/components/ThemedView';
 import IntervalCountdown from '@/components/IntervalCountdown';
+import { useDashboard } from '@/utils/dashboardStore';
 
 export default function Dashboard() {
   const { data, error, fetchNextPage, isFetching, isLoading, refetch } =
     useLatestList();
+  const [{ lastFetchTime }] = useDashboard();
   const coins = data?.pages.flat();
-  console.log({ isLoading, isFetching });
 
   // live updates
   const { data: updates, refetch: refetchUpdates } = useUpdates(
-    coins?.map((coin) => coin.id) || [], // TODO: do not call API when no coins
+    coins?.map((coin) => coin.id) || [],
   );
   const updatedCoins = coins?.map((coin) => {
     const update = updates?.find((u) => u.id === coin.id);
-    return update ? { ...coin, ...update } : coin;
+    if (!update) return coin;
+    return new Date(coin.last_updated) > new Date(update.last_updated)
+      ? coin
+      : update;
   });
 
   // search
@@ -53,7 +57,14 @@ export default function Dashboard() {
             renderItem={({ item }) => <PriceItem coin={item} />}
             estimatedItemSize={100}
             refreshControl={
-              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+              <RefreshControl
+                refreshing={isFetching}
+                onRefresh={() => {
+                  if (Date.now() - lastFetchTime.getTime() > 20000) {
+                    refetch();
+                  }
+                }}
+              />
             }
             onEndReached={fetchNextPage}
             onEndReachedThreshold={0.1}
