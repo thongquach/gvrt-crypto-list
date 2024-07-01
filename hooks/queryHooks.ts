@@ -31,9 +31,10 @@ const fetchLatestList = async (page = 0) => {
   return data.data;
 };
 
+export const LATEST_LIST_KEY = 'latestList';
 export const useLatestList = () => {
   return useInfiniteQuery({
-    queryKey: ['latestList'],
+    queryKey: [LATEST_LIST_KEY],
     queryFn: ({ pageParam }) => fetchLatestList(pageParam),
     initialPageParam: 0,
     getNextPageParam: (_firstPage, _allPages, lastPageParam) =>
@@ -52,9 +53,10 @@ const fetchUpdates = async (ids: number[]) => {
   return Object.values(data.data);
 };
 
+export const UPDATES_KEY = 'updates';
 export const useUpdates = (ids: number[]) => {
   return useQuery({
-    queryKey: ['updates', ids],
+    queryKey: [UPDATES_KEY, ids],
     queryFn: () => fetchUpdates(ids),
     staleTime: 0,
     enabled: false,

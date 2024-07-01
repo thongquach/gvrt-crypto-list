@@ -1,7 +1,12 @@
 import { ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import { Coin, useLatestList, useUpdates } from '@/hooks/queryHooks';
+import {
+  Coin,
+  LATEST_LIST_KEY,
+  useLatestList,
+  useUpdates,
+} from '@/hooks/queryHooks';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
 import React, { useEffect } from 'react';
 import SearchInput from '@/components/SeachInput';
@@ -10,7 +15,7 @@ import { PriceItem } from '@/components/PriceItem';
 import { ThemedView } from '@/components/ThemedView';
 import IntervalCountdown from '@/components/IntervalCountdown';
 import { useDashboard } from '@/utils/dashboardStore';
-import queryClient from '@/utils/queryClient';
+import queryClient, { STALE_TIME } from '@/utils/queryClient';
 import { InfiniteData } from '@tanstack/react-query';
 import CurrentTime from '@/components/CurrentTime';
 
@@ -73,13 +78,13 @@ export default function Dashboard() {
                 refreshing={isFetching}
                 onRefresh={() => {
                   queryClient.setQueryData(
-                    ['latestList'],
+                    [LATEST_LIST_KEY],
                     (data: InfiniteData<Coin>) => ({
                       pages: data.pages.slice(0, 1),
                       pageParams: data.pageParams.slice(0, 1),
                     }),
                   );
-                  if (Date.now() - lastFetchTime.getTime() > 60000) {
+                  if (Date.now() - lastFetchTime.getTime() > STALE_TIME) {
                     refetch();
                   }
                 }}
