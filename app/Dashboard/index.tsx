@@ -20,14 +20,14 @@ export default function Dashboard() {
   const { data: updates, refetch: refetchUpdates } = useUpdates(
     coins?.map((coin) => coin.id) || [], // TODO: do not call API when no coins
   );
-  const mergedCoins = coins?.map((coin) => {
+  const updatedCoins = coins?.map((coin) => {
     const update = updates?.find((u) => u.id === coin.id);
     return update ? { ...coin, ...update } : coin;
   });
 
   // search
   const [search, setSearch] = React.useState('');
-  const filteredCoins = mergedCoins?.filter(
+  const filteredCoins = updatedCoins?.filter(
     (coin) =>
       coin.name.toLowerCase().includes(search.toLowerCase()) ||
       coin.symbol.toLowerCase().includes(search.toLowerCase()),
@@ -48,7 +48,7 @@ export default function Dashboard() {
             />
           </ThemedView>
           <FlashList
-            data={mergedCoins}
+            data={filteredCoins}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <PriceItem coin={item} />}
             estimatedItemSize={100}
