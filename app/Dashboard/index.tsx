@@ -23,7 +23,15 @@ export default function Dashboard() {
   const { data, error, fetchNextPage, isFetching, isLoading, refetch } =
     useLatestList();
   const [{ lastFetchTime }] = useDashboard();
-  const coins = data?.pages.flat();
+  let coins = data?.pages.flat() || [];
+  coins = coins.reduce<Coin[]>((acc, current) => {
+    const x = acc.find((item) => item.id === current.id);
+    if (!x) {
+      return acc.concat([current]);
+    } else {
+      return acc;
+    }
+  }, []);
 
   // live updates
   const { data: updates, refetch: refetchUpdates } = useUpdates(
